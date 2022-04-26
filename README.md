@@ -1,3 +1,3 @@
-# Aab-Saenkeslagskib-Peter-Bjark-Soren
+# Aab-Saenkeslagskib-Peter-Bjarke-Soren
 
 Sænkeslagskib manual
