@@ -10,7 +10,7 @@ enum Flag {
 // enumeration type for variable error
 enum Error {
   VARIABLEERROR, OK
-}
+};
 
 // flag variables for control flag.
 Flag flag;
