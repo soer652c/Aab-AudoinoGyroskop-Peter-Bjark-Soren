@@ -1,3 +1,19 @@
+import processing.core.*; 
+import processing.data.*; 
+import processing.event.*; 
+import processing.opengl.*; 
+
+import java.util.HashMap; 
+import java.util.ArrayList; 
+import java.io.File; 
+import java.io.BufferedReader; 
+import java.io.PrintWriter; 
+import java.io.InputStream; 
+import java.io.OutputStream; 
+import java.io.IOException; 
+
+public class Main_sketch_220310a extends PApplet {
+
 int interval = 50;
 int gentagelser = 0;
 int sidsteTid = 0;
@@ -22,19 +38,19 @@ int targetModeAttempts = 4;
 int sidsteMissilXakse = 0;
 int sidsteMissilYakse = 0;
 
-color skib = color(153, 165, 178);
-color traeffer = color(228, 64, 93);
-color misser = color(249, 118, 37);
+int skib = color(153, 165, 178);
+int traeffer = color(228, 64, 93);
+int misser = color(249, 118, 37);
 
 final int SKIB = 1;
 final int TRAEFFER = -1;
 final int MISSER = -2;
 
-void setup() {
-    size(800, 400, FX2D);
+public void setup() {
+    
     // draw background of gitter
     stroke(50);
-    noSmooth();
+    
     // init. array
     gitter = new int[width/gitterStoerrelse][height/gitterStoerrelse];
     for(int x=0; x < width/gitterStoerrelse; x++) {
@@ -46,7 +62,7 @@ void setup() {
 }
 
 // Draw game state to canvas.
-void draw() {
+public void draw() {
     background(color(50, 57, 66));
     // draw gitter
     for (int x=0; x < width/gitterStoerrelse; x++) {
@@ -89,7 +105,7 @@ void draw() {
 }
 
 // Determine if the game is over.
-boolean alleSkibeSmadret() {
+public boolean alleSkibeSmadret() {
      for(int x=0; x < width/gitterStoerrelse; x++) {
         for(int y=0; y< height/gitterStoerrelse; y++) {
             if (gitter[x][y] == SKIB) {
@@ -102,7 +118,7 @@ boolean alleSkibeSmadret() {
 }
 
 // Add N E S W locations relative to fraXaksen and fraYaksen.
-ArrayList<PVector> findMaal(int fraXaksen, int fraYaksen) {
+public ArrayList<PVector> findMaal(int fraXaksen, int fraYaksen) {
     ArrayList<PVector> koordinater = new ArrayList<PVector>();
     // FIX: this is naive  do not take into account whether the
     // coordinate has already been traeffer or missed.
@@ -114,7 +130,7 @@ ArrayList<PVector> findMaal(int fraXaksen, int fraYaksen) {
 }
 
 // Iteration updates world state.
-void gentag() {
+public void gentag() {
     if (alleSkibeSmadret()) {
         return;
     }
@@ -126,15 +142,15 @@ void gentag() {
         targetModeAttempts = targetModeAttempts - 1;
         ArrayList<PVector> tg = findMaal(sidsteMissilXakse, sidsteMissilYakse);
         PVector p = tg.get(targetModeAttempts);
-        x = int(p.x);
-        y = int(p.y);
+        x = PApplet.parseInt(p.x);
+        y = PApplet.parseInt(p.y);
         if (targetModeAttempts == 0) {
             maalIndstilling = false;
             targetModeAttempts = 4;
         }
     } else {
-        x = int(random(width/gitterStoerrelse));
-        y = int(random(height/gitterStoerrelse));
+        x = PApplet.parseInt(random(width/gitterStoerrelse));
+        y = PApplet.parseInt(random(height/gitterStoerrelse));
     }
 
     if (gitter[x][y] == SKIB) {
@@ -153,7 +169,7 @@ void gentag() {
 }
 
 // Placer skibe på gitter.
-void placerSkibe() {
+public void placerSkibe() {
 
     // hangarkib 5 lang
     gitter[1][1] = SKIB;
@@ -181,4 +197,28 @@ void placerSkibe() {
     gitter[12][2] = SKIB;
     gitter[13][2] = SKIB;
     gitter[14][2] = SKIB;
+}
+public void setup() {  // setup() runs once
+  size(800, 200);
+  stroke(50);
+
+}
+
+public void draw() {  // draw() loops forever, until stopped
+  background(204);
+  yPos = yPos - 1.0f;
+  if (yPos < 0) {
+    yPos = height;
+  }
+  line(0, yPos, width, yPos);
+}
+  public void settings() {  size(800, 400, FX2D);  noSmooth(); }
+  static public void main(String[] passedArgs) {
+    String[] appletArgs = new String[] { "Main_sketch_220310a" };
+    if (passedArgs != null) {
+      PApplet.main(concat(appletArgs, passedArgs));
+    } else {
+      PApplet.main(appletArgs);
+    }
+  }
 }
