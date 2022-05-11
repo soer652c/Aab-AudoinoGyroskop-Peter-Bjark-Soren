@@ -36,12 +36,17 @@ class Skib {
     return gh;
   }
 
+  public void taendSpil(Tilstand h){
+  tilstand = Tilstand.STARTET;
+  gh = h;
+  }
+
   public void stopSpil(Tilstand h) {
     tilstand = Tilstand.IKKESTARTET;
     gh = h;
   }
 
-  public void ramt() {
+  public void markoer() {
     tilstand = Tilstand.RAMT;
   }
 
@@ -86,13 +91,14 @@ class Skib {
       }
     }
 
-  }
-
-  public boolean mouseClicked() {
-    if((mouseY >= yAksen) && (mouseY <= yAksen + kant) && (mouseX >= xAksen) && (mouseX <= xAksen + kant)) {
+  public boolean click()
+  {
+    if ((mouseX >= xAksen) && (mouseX <= xAksen + kant)
+      && (mouseY >= yAksen) && (mouseY <= yAksen + kant))
+    {
       return true;
-    }
-    else {
+    } else
+    {
       return false;
     }
   }
@@ -103,3 +109,4 @@ class Skib {
       gh = h;
     }
   }
+}

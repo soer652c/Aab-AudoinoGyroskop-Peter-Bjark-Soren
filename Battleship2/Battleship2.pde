@@ -1,4 +1,4 @@
-Map map;
+Plade plade;
 Knapper start;
 Knapper exit;
 Knapper spil_ovre;
@@ -33,10 +33,10 @@ void setup() {
 
   vundet = Tilstand.UDEFINERET;
 
-  map = new Map(10);
-  start = new Knapper(150, 150, "START");
-  exit = new Knapper(150, 214, "Exit");
-  spil_ovre = new Knapper(0, 500, "Done");
+  plade = new Plade(10);
+  start = new Knapper(150.00, 150.00, "START");
+  exit = new Knapper(150.00, 214.00, "Exit");
+  spil_ovre = new Knapper(0.00, 500.00, "Done");
 }
 
 void draw() {
@@ -45,7 +45,7 @@ void draw() {
   // display little menu
   if (flag == Flag.STANDBY) {
 
-    start_spil.display();
+    start.display();
     exit.display();
     switch(vundet) {
     case SPILLER:
@@ -61,8 +61,8 @@ void draw() {
     }
   }
   else if (flag == Flag.NYTSPIL) {
-    map.display();
-    spil_ovre.unlock();
+    plade.display();
+    spil_ovre.oplaast();
     vundet = Tilstand.UDEFINERET;
     if (flag2 == Flag.POSITION)
     {
@@ -73,7 +73,7 @@ void draw() {
   {
     fill(0);
     textSize(50);
-    text("ENDE", 150, 150);
+    text("SLUT", 150, 150);
   }
 
   switch (error)
@@ -81,69 +81,69 @@ void draw() {
   case VARIABLEERROR:
     fill(0);
     textSize(20);
-    text("Zu wenig Schiffe", 260, 550);
+    text("Ikke nok skibe placeret", 260, 550);
     break;
   }
 }
 
 void mouseClicked()
 {
-  if (mouseButton == LEFT)
+  if(mouseButton == LEFT)
   {
-    if (start_spil.click())
+    if(start.click())
     {
-      start_spil.display1(); // for knap animation.
+      start.displayEt(); // for knap animation.
       flag = Flag.NYTSPIL;
-      start_spil.lock();
-      exit.lock();
+      start.laast();
+      exit.laast();
     }
 
     if (exit.click())
     {
-      exit.display1(); // for knap animation.
+      exit.displayEt(); // for knap animation.
       flag = Flag.EXITSPIL;
-      start_spil.lock();
-      exit.lock();
+      start.laast();
+      exit.laast();
     }
 
     if (flag == Flag.NYTSPIL)
     {
       if (flag2 == Flag.POSITION)
       {
-        map.setShip();
+        plade.placerSkibe();
       } else if (flag2 == Flag.GAET)
       {
-        map.guess();
-        switch(map.vundet())
+        plade.gaet();
+        switch(plade.vundet())
         {
         case SPILLER:
           flag = Flag.STANDBY;
           flag2 = Flag.POSITION;
-          start_spil.unlock();
-          exit.unlock();
+          start.oplaast();
+          exit.oplaast();
           vundet = Tilstand.SPILLER;
-          map.reset();
+          plade.genstart();
           break;
         case AI:
           flag = Flag.STANDBY;
           flag2 = Flag.POSITION;
-          start_spil.unlock();
-          exit.unlock();
+          start.oplaast();
+          exit.oplaast();
           vundet = Tilstand.AI;
-          map.reset();
+          plade.genstart();
           break;
         }
       }
 
       if (spil_ovre.click())
       {
-        spil_ovre.display1(); // for knap animation.
-        if (map.getNumShips() == map.MAX())
+        spil_ovre.displayEt(); // for knap animation.
+        if (plade.getSpillerSkibe() == plade.MAXSKIBE())
         {
-          spil_ovre.lock();
+          spil_ovre.laast();
           flag2 = Flag.GAET;
           error = Error.OK;
-          map.createShipsForPC();
+          plade.aiSkibe();
         }
         else
         {

@@ -198,20 +198,6 @@ public void placerSkibe() {
     gitter[13][2] = SKIB;
     gitter[14][2] = SKIB;
 }
-public void setup() {  // setup() runs once
-  size(800, 200);
-  stroke(50);
-
-}
-
-public void draw() {  // draw() loops forever, until stopped
-  background(204);
-  yPos = yPos - 1.0f;
-  if (yPos < 0) {
-    yPos = height;
-  }
-  line(0, yPos, width, yPos);
-}
   public void settings() {  size(800, 400, FX2D);  noSmooth(); }
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "Main_sketch_220310a" };
