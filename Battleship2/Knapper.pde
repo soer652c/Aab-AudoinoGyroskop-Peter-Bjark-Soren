@@ -9,7 +9,7 @@ class Knapper {
   private PImage [] piimgs;
   private PImage knapbilleder;
 
-  public Knap(float yAksen, float xAksen, Sting navn) {
+  public Knapper(float yAksen, float xAksen, String navn) {
     this.yAksen = yAksen;
     this.xAksen = xAksen;
     this.navn = navn;
@@ -32,6 +32,14 @@ class Knapper {
     text(navn, yAksen+FORSKYDNING, xAksen+FORSKYDNING);
   }
 
+  public void displayNull() {
+    final float FORSKYDNING = 32;
+    image(piimgs[0], xAksen, yAksen);
+    fill(0);
+    textSize(30);
+    text(navn, yAksen+FORSKYDNING, xAksen+FORSKYDNING);
+  }
+
   public void displayEt() {
     final float FORSKYDNING = 32;
     image(piimgs[1], xAksen, yAksen);
@@ -40,22 +48,27 @@ class Knapper {
     text(navn, yAksen+FORSKYDNING, xAksen+FORSKYDNING);
   }
 
-  public boolean mouseClicked() {
-    if(tilstand && (mouseY >= yAksen) && (mouseY <= yAksen+hoejde) && (mouseX >= xAksen) && (mouseX <= xAksen+brede)) {
+  public boolean click()
+  {
+    if (tilstand && (mouseX >= xAksen) && (mouseX <= xAksen+brede) 
+      && (mouseY >= yAksen) && (mouseY <= yAksen + hoejde))
+    {
       indeks = 1;
       return true;
-    }
-    else {
+    } else
+    {
       indeks = 0;
       return false;
     }
   }
 
-  public void laast() {
+  public void laast() 
+  {
     tilstand = false;
   }
 
-  public void oplaast() {
+  public void oplaast() 
+  {
     tilstand = true;
   }
 }

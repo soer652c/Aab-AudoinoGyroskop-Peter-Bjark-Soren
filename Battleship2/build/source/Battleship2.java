@@ -14,7 +14,7 @@ import java.io.IOException;
 
 public class Battleship2 extends PApplet {
 
-Map map;
+Plade plade;
 Knapper start;
 Knapper exit;
 Knapper spil_ovre;
@@ -26,7 +26,7 @@ enum Flag {
 // enumeration type for variable error
 enum Error {
   VARIABLEERROR, OK
-}
+};
 
 // flag variables for control flag.
 Flag flag;
@@ -49,10 +49,10 @@ public void setup() {
 
   vundet = Tilstand.UDEFINERET;
 
-  map = new Map(10);
-  start = new Knapper(150, 150, "START");
-  exit = new Knapper(150, 214, "Exit");
-  spil_ovre = new Knapper(0, 500, "Done");
+  plade = new Plade(10);
+  start = new Knapper(150.00f, 150.00f, "START");
+  exit = new Knapper(150.00f, 214.00f, "Exit");
+  spil_ovre = new Knapper(0.00f, 500.00f, "Done");
 }
 
 public void draw() {
@@ -61,7 +61,7 @@ public void draw() {
   // display little menu
   if (flag == Flag.STANDBY) {
 
-    start_spil.display();
+    start.display();
     exit.display();
     switch(vundet) {
     case SPILLER:
@@ -77,8 +77,8 @@ public void draw() {
     }
   }
   else if (flag == Flag.NYTSPIL) {
-    map.display();
-    spil_ovre.unlock();
+    plade.display();
+    spil_ovre.oplaast();
     vundet = Tilstand.UDEFINERET;
     if (flag2 == Flag.POSITION)
     {
@@ -89,7 +89,7 @@ public void draw() {
   {
     fill(0);
     textSize(50);
-    text("ENDE", 150, 150);
+    text("SLUT", 150, 150);
   }
 
   switch (error)
@@ -97,69 +97,69 @@ public void draw() {
   case VARIABLEERROR:
     fill(0);
     textSize(20);
-    text("Zu wenig Schiffe", 260, 550);
+    text("Ikke nok skibe placeret", 260, 550);
     break;
   }
 }
 
 public void mouseClicked()
 {
-  if (mouseButton == LEFT)
+  if(mouseButton == LEFT)
   {
-    if (start_spil.click())
+    if(start.click())
     {
-      start_spil.display1(); // for knap animation.
+      start.displayEt(); // for knap animation.
       flag = Flag.NYTSPIL;
-      start_spil.lock();
-      exit.lock();
+      start.laast();
+      exit.laast();
     }
 
     if (exit.click())
     {
-      exit.display1(); // for knap animation.
+      exit.displayEt(); // for knap animation.
       flag = Flag.EXITSPIL;
-      start_spil.lock();
-      exit.lock();
+      start.laast();
+      exit.laast();
     }
 
     if (flag == Flag.NYTSPIL)
     {
       if (flag2 == Flag.POSITION)
       {
-        map.setShip();
+        plade.placerSkibe();
       } else if (flag2 == Flag.GAET)
       {
-        map.guess();
-        switch(map.vundet())
+        plade.gaet();
+        switch(plade.vundet())
         {
         case SPILLER:
           flag = Flag.STANDBY;
           flag2 = Flag.POSITION;
-          start_spil.unlock();
-          exit.unlock();
+          start.oplaast();
+          exit.oplaast();
           vundet = Tilstand.SPILLER;
-          map.reset();
+          plade.genstart();
           break;
         case AI:
           flag = Flag.STANDBY;
           flag2 = Flag.POSITION;
-          start_spil.unlock();
-          exit.unlock();
+          start.oplaast();
+          exit.oplaast();
           vundet = Tilstand.AI;
-          map.reset();
+          plade.genstart();
           break;
         }
       }
 
       if (spil_ovre.click())
       {
-        spil_ovre.display1(); // for knap animation.
-        if (map.getNumShips() == map.MAX())
+        spil_ovre.displayEt(); // for knap animation.
+        if (plade.getSpillerSkibe() == plade.MAXSKIBE())
         {
-          spil_ovre.lock();
+          spil_ovre.laast();
           flag2 = Flag.GAET;
           error = Error.OK;
-          map.createShipsForPC();
+          plade.aiSkibe();
         }
         else
         {
@@ -180,7 +180,7 @@ class Knapper {
   private PImage [] piimgs;
   private PImage knapbilleder;
 
-  public Knap(float yAksen, float xAksen, Sting navn) {
+  public Knapper(float yAksen, float xAksen, String navn) {
     this.yAksen = yAksen;
     this.xAksen = xAksen;
     this.navn = navn;
@@ -203,6 +203,14 @@ class Knapper {
     text(navn, yAksen+FORSKYDNING, xAksen+FORSKYDNING);
   }
 
+  public void displayNull() {
+    final float FORSKYDNING = 32;
+    image(piimgs[0], xAksen, yAksen);
+    fill(0);
+    textSize(30);
+    text(navn, yAksen+FORSKYDNING, xAksen+FORSKYDNING);
+  }
+
   public void displayEt() {
     final float FORSKYDNING = 32;
     image(piimgs[1], xAksen, yAksen);
@@ -211,37 +219,42 @@ class Knapper {
     text(navn, yAksen+FORSKYDNING, xAksen+FORSKYDNING);
   }
 
-  public boolean mouseClicked() {
-    if(tilstand && (mouseY >= yAksen) && (mouseY <= yAksen+hoejde) && (mouseX >= xAksen) && (mouseX <= xAksen+brede)) {
+  public boolean click()
+  {
+    if (tilstand && (mouseX >= xAksen) && (mouseX <= xAksen+brede) 
+      && (mouseY >= yAksen) && (mouseY <= yAksen + hoejde))
+    {
       indeks = 1;
       return true;
-    }
-    else {
+    } else
+    {
       indeks = 0;
       return false;
     }
   }
 
-  public void laast() {
+  public void laast() 
+  {
     tilstand = false;
   }
 
-  public void oplaast() {
+  public void oplaast() 
+  {
     tilstand = true;
   }
 }
-class Map {
+class Plade {
   private int A; //Navn på int
   private int spillerSkibe; //Spillerens Skibe
   private int aiSkibe; //Computerens Skibe
-  private final int MAKSIMUMSKIBEPLACERET = 5; //Den maksimale mængde skibe spilleren kan placere
-  private Skib [][] map;
+  private final int MAXIMUMSKIBEPLACERET = 5; //Den maksimale mængde skibe spilleren kan placere
+  private Skib [][] kort;
 
-  public Map(int A)
+  public Plade(int A)
   {
     this.A = A;
     spillerSkibe = 0;
-    map = new Skib[A][A];
+    kort = new Skib[A][A];
     Skib skib = null;
 
     for(int g = 0; g < A; g++)
@@ -249,134 +262,144 @@ class Map {
       for(int h = 0; h < A; h++)
       {
         skib = new Skib(50*g, 50*h);
-        map[g][h] = skib;
+        kort[g][h] = skib;
       }
     }
   }
 
-public void display()
-{
-  for (int g = 0; g < A; g++)
+  public void display()
   {
-    for (int h = 0; h < A; h++)
+    for (int g = 0; g < A; g++)
     {
-      map[g][h].display();
-    }
-  }
-}
-public void placerSkibe()
-{
-  for (int g = 0; g < A; g++)
-  {
-    for (int h = 0; h < A; h++)
-    {
-      if (map[g][h].mouseClicked())
+      for (int h = 0; h < A; h++)
       {
-        if (map[g][h].ilstandNu() == Tilstand.IKKESTARTET)
+        kort[g][h].display();
+      }
+    }
+  }
+  public void placerSkibe()
+  {
+    for(int g = 0; g < A; g++)
+    {
+      for(int h = 0; h < A; h++)
+      {
+        if (kort[g][h].click())
         {
-          if (spillerSkibe < MAKSIMUMSKIBEPLACERET) {
-            map[g][h].tilstandTaendt(Tilstand.SPILLER);
-            spillerSkibe++;
-        }
-      }
-      else {
-        map[g][h].stopSpil(Tilstand.STOPPET);
-        spillerSkibe--;
-      }
-    }
-    }
-  }
-}
-
-public void aiSkibe() {
-  int skibCounter = 0;
-  float randomValue = 0;
-  for (int g = 0; g < A; g++) {
-    for (int h = 0; h < A; h++) {
-      if ((skibCounter < MAKSIMUMSKIBEPLACERET) && (map[g][h].getGH() != Tilstand.AI) && (map[g][h].getGH() != Tilstand.SPILLER)) {
-        randomValue = random(1);
-        if (randomValue >= 0.7f && randomValue <= 0.9f) {
-          if (map[g][h].getGH() != Tilstand.SPILLER) {
-            map[g][h].tilstandTaendt(Tilstand.AI);
-            skibCounter++;
+          if (kort[g][h].tilstandNu() == Tilstand.IKKESTARTET)
+          {
+            if (spillerSkibe < MAXIMUMSKIBEPLACERET) {
+              kort[g][h].taendSpil(Tilstand.SPILLER);
+              spillerSkibe++;
+            }
+          }
+        else
+          {
+          kort[g][h].stopSpil(Tilstand.UDEFINERET);
+          spillerSkibe--;
           }
         }
       }
     }
   }
-if (skibCounter == 5) {
-  aiSkibe = 5;
-}
-else {
-  throw new RuntimeException("placer flere skibe");
-}
-}
 
-public void gaet() {
-  Skib skib = null;
-  int optaeller = 0;
-  for (int g = 0; g < A; g++) {
-    for (int h = 0; h < A; h++) {
-      skib = map[g][h];
-      if (skib.mouseClicked()) {
-        if (skib.getGH() == Tilstand.AI) {
-          if (skib.tilstandNu == Tilstand.STARTET) {
-            skib.ramt();
-            aiSkibe--;
+  public void aiSkibe() {
+    int skibCounter = 0;
+    float randomValue = 0;
+    for (int g = 0; g < A; g++) {
+      for (int h = 0; h < A; h++) {
+        if ((skibCounter < MAXIMUMSKIBEPLACERET) && (kort[g][h].getGH() != Tilstand.AI) && (kort[g][h].getGH() != Tilstand.SPILLER)) {
+          randomValue = random(1);
+          if (randomValue >= 0.7f && randomValue <= 0.9f) {
+            if (kort[g][h].getGH() != Tilstand.SPILLER) {
+              kort[g][h].taendSpil(Tilstand.AI);
+              skibCounter++;
             }
           }
-          else {
-            skib.marker(Tilstand.SPILLER);
-          }
-          while (optaeller < 1) {
-            skib = map[(int)random(A)][(int)random(A)];
-            while ((skib.getGH() == Tilstand.AI) || (skib.tilstandNu() == Tilstand.MARKOER) && (skib.tilstandNu() == Tilstand.RAMT)) {
-              skib = map[(int)random(A)][(int)random(A)];
-            }
-            if (skib.getGH() == Tilstand.SPILLER) {
-              if (skib.tilstandNu() == Tilstand.STARTET) {
-                skib.ramt();
-                optaeller++;
-                spillerSkibe--;
-              }
-              else {
-                skib.ramt(Tilstand.AI);
-                optaeller++;
+        }
+      }
+    }
+  if (skibCounter == 5) {
+    aiSkibe = 5;
+  }
+  else {
+    throw new RuntimeException("placer flere skibe");
+  }
+  }
+
+  public void gaet() {
+    Skib skib = null;
+    int optaeller = 0;
+    for (int g = 0; g < A; g++) {
+      for (int h = 0; h < A; h++) {
+        skib = kort[g][h];
+        if (skib.click()) {
+          if (skib.getGH() == Tilstand.AI) {
+            if (skib.tilstandNu() == Tilstand.STARTET) {
+              skib.markoer();
+              aiSkibe--;
               }
             }
+            else {
+              skib.markoer(Tilstand.SPILLER);
+            }
+            while (optaeller < 1)
+            {
+              skib = kort[(int)random(A)][(int)random(A)];
+              while ((skib.getGH() == Tilstand.AI) || (skib.tilstandNu() == Tilstand.MARKOER) && (skib.tilstandNu() == Tilstand.RAMT))
+              {
+                skib = kort[(int)random(A)][(int)random(A)];
+              }
+              if (skib.getGH() == Tilstand.SPILLER)
+              {
+                if (skib.tilstandNu() == Tilstand.STARTET)
+                {
+                  skib.markoer();
+                  optaeller++;
+                  spillerSkibe--;
+                }
+               else
+               {
+                 skib.markoer(Tilstand.AI);
+                 optaeller++;
+               }
+              }
+
+            assert(optaeller == 1);
+            optaeller = 0;
           }
-          assert(optaeller == 1);
-          optaeller = 0;
         }
       }
     }
   }
-public int getSpillerSkibe() {
-  return spillerSkibe;
-}
-public int MAXIMUMSKIBE() {
-  MAXIMUMSKIBE;
-}
-public Tilstand vundet() {
-  if (aiSkibe == 0){
-    return Tilstand.SPILLER;
+  public int getSpillerSkibe() {
+      return spillerSkibe;
   }
-  if (spillerSkibe == 0) {
-    return Tilstand.AI;
-  }
-  return Tilstand.STOPPET;
-}
 
-public void genstart() {
-  Skib skib = null;
-  for (int g = 0; g < A; g++) {
-    for (int h = 0; h < A; h++) {
-      skib = new Skib(50*g, 50*h);
-      map[g][h] = skib;
-    }
+  public int MAXSKIBE() {
+    return MAXIMUMSKIBEPLACERET;
   }
-  spillerSkibe = aiSkibe = 0;
-}
+
+  public Tilstand vundet() {
+    if (aiSkibe == 0){
+      return Tilstand.SPILLER;
+    }
+    if (spillerSkibe == 0) {
+      return Tilstand.AI;
+    }
+    return Tilstand.UDEFINERET;
+  }
+
+  public void genstart() {
+    Skib skib = null;
+    for (int g = 0; g < A; g++) {
+      for (int h = 0; h < A; h++) {
+        skib = new Skib(50*g, 50*h);
+        kort[g][h] = skib;
+      }
+    }
+    spillerSkibe = aiSkibe = 0;
+  }
+
 }
 enum Tilstand {
   STARTET, IKKESTARTET, RAMT, SPILLER, AI, UDEFINERET, MARKOER
@@ -416,12 +439,17 @@ class Skib {
     return gh;
   }
 
+  public void taendSpil(Tilstand h){
+  tilstand = Tilstand.STARTET;
+  gh = h;
+  }
+
   public void stopSpil(Tilstand h) {
     tilstand = Tilstand.IKKESTARTET;
     gh = h;
   }
 
-  public void ramt() {
+  public void markoer() {
     tilstand = Tilstand.RAMT;
   }
 
@@ -466,13 +494,14 @@ class Skib {
       }
     }
 
-  }
-
-  public boolean mouseClicked() {
-    if((mouseY >= yAksen) && (mouseY <= yAksen + kant) && (mouseX >= xAksen) && (mouseX <= xAksen + kant)) {
+  public boolean click()
+  {
+    if ((mouseX >= xAksen) && (mouseX <= xAksen + kant)
+      && (mouseY >= yAksen) && (mouseY <= yAksen + kant))
+    {
       return true;
-    }
-    else {
+    } else
+    {
       return false;
     }
   }
@@ -483,6 +512,7 @@ class Skib {
       gh = h;
     }
   }
+}
   public void settings() {  size(600, 700); }
   static public void main(String[] passedArgs) {
     String[] appletArgs = new String[] { "Battleship2" };
