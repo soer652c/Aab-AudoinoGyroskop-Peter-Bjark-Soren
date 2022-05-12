@@ -66,14 +66,15 @@ class Plade
 
   public void genererAiSkibe()
   {
-    int skibCounter = 0;
-    float randomValue = 0;
+    int skibCounter = 0; //sætter skibtælleren til 0
+    float randomValue = 0; //sætter randomValue til 0
     for (int g = 0; g < A; g++)
     {
       for (int h = 0; h < A; h++)
       {
 
-        if ((skibCounter < MAXIMUMSKIBEPLACERET) && (kort[g][h].getGH() != Tilstand.AI) && (kort[g][h].getGH() != Tilstand.SPILLER))
+        if ((skibCounter < MAXIMUMSKIBEPLACERET) && (kort[g][h].getGH() != Tilstand.AI)
+        && (kort[g][h].getGH() != Tilstand.SPILLER)) //hvis skibscounteren er mindre end maxskibe og det er AI'ens tur starter denne if funktion
         {
           randomValue = random(1);
           if (randomValue >= 0.7 && randomValue <= 0.9 )
@@ -88,12 +89,12 @@ class Plade
       }
     }
 
-    if (skibCounter == 5)
+    if (skibCounter == 5) //hvis skibCounter er det samme som 5
     {
-      aiSkibe = 5;
-    } else
+      aiSkibe = 5; //sæt aiSkibe til 5
+    } else //hvis IKKE skibsCounter er det samme som 5
     {
-      throw new RuntimeException("Placer Venligst flere skibe");
+      throw new RuntimeException("Placer Venligst flere skibe");//udskriv error "Placer Venligst Flere skibe"
     }
   }
 
@@ -121,7 +122,7 @@ class Plade
             skib.markoer(Tilstand.SPILLER);
           }
 
-          // pc guesses a ship.
+
 
           while (optaeller < 1)
           {
