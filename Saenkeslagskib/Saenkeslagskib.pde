@@ -3,77 +3,82 @@ Knapper start;
 Knapper exit;
 Knapper spil_ovre;
 
-enum Flag {
-  STANDBY, NYTSPIL, EXITSPIL, POSITION, GAET
+
+enum Marker {
+  STANDBY, NYTSPIL, STOPSPIL, POSITION, GAET
 };
 
-// enumeration type for variable error
+
 enum Error {
   VARIABLEERROR, OK
 };
 
-// flag variables for control flag.
-Flag flag;
-Flag flag2;
 
-// for error handling
+Marker marker;
+Marker marker2;
+
+
 Error error;
+
 
 Tilstand vundet;
 
-void setup() {
-  size(600, 700);
-  background(245);
-  frameRate(30);
+void setup()
+{
+  size(500, 600);
+  background(0, 0, 0);
+  frameRate(60);
 
-  flag = Flag.STANDBY;
-  flag2 = Flag.POSITION;
+  marker = Marker.STANDBY;
+  marker2 = Marker.POSITION;
 
   error = Error.OK;
 
   vundet = Tilstand.UDEFINERET;
 
   plade = new Plade(10);
-  start = new Knapper(150.00, 150.00, "START");
-  exit = new Knapper(150.00, 214.00, "Exit");
-  spil_ovre = new Knapper(0.00, 500.00, "Done");
+  start = new Knapper(125, 150, "Placer Skibe");
+  exit = new Knapper(125, 214, "Luk Spil");
+  spil_ovre = new Knapper(0, 500, "Start");
 }
 
-void draw() {
-  background(255);
+void draw()
+{
+  background(105, 48, 10);
 
-  // display little menu
-  if (flag == Flag.STANDBY) {
+
+  if (marker == Marker.STANDBY)
+  {
 
     start.display();
     exit.display();
-    switch(vundet) {
+    switch(vundet)
+    {
     case SPILLER:
       fill(0);
       textSize(50);
-      text("You vundet!", 150, 150);
+      text("Du vandt :happyface:", 5, 140);
       break;
     case AI:
       fill(0);
       textSize(50);
-      text("You lose!", 150, 150);
+      text("Du tabte :sadface:", 30, 140);
       break;
     }
-  }
-  else if (flag == Flag.NYTSPIL) {
+  } else if (marker == Marker.NYTSPIL)
+  {
     plade.display();
     spil_ovre.oplaast();
     vundet = Tilstand.UDEFINERET;
-    if (flag2 == Flag.POSITION)
+    if (marker2 == Marker.POSITION)
     {
       spil_ovre.display();
     }
-  }
-  else
+  } else
   {
     fill(0);
     textSize(50);
-    text("SLUT", 150, 150);
+    text("...", 150, 150);
   }
 
   switch (error)
@@ -81,52 +86,52 @@ void draw() {
   case VARIABLEERROR:
     fill(0);
     textSize(20);
-    text("Ikke nok skibe placeret", 260, 550);
+    text("Placer Flere Skibe!", 260, 550);
     break;
   }
 }
 
 void mouseClicked()
 {
-  if(mouseButton == LEFT)
+  if (mouseButton == LEFT)
   {
-    if(start.click())
+    if (start.click())
     {
-      start.displayEt(); // for knap animation.
-      flag = Flag.NYTSPIL;
+      start.displayEt();
+      marker = Marker.NYTSPIL;
       start.laast();
       exit.laast();
     }
 
     if (exit.click())
     {
-      exit.displayEt(); // for knap animation.
-      flag = Flag.EXITSPIL;
+      exit.displayEt();
+      marker = Marker.STOPSPIL;
       start.laast();
       exit.laast();
     }
 
-    if (flag == Flag.NYTSPIL)
+    if (marker == Marker.NYTSPIL)
     {
-      if (flag2 == Flag.POSITION)
+      if (marker2 == Marker.POSITION)
       {
         plade.placerSkibe();
-      } else if (flag2 == Flag.GAET)
+      } else if (marker2 == Marker.GAET)
       {
-        plade.gaet();
+        plade.guess();
         switch(plade.vundet())
         {
         case SPILLER:
-          flag = Flag.STANDBY;
-          flag2 = Flag.POSITION;
+          marker = Marker.STANDBY;
+          marker2 = Marker.POSITION;
           start.oplaast();
           exit.oplaast();
           vundet = Tilstand.SPILLER;
           plade.genstart();
           break;
         case AI:
-          flag = Flag.STANDBY;
-          flag2 = Flag.POSITION;
+          marker = Marker.STANDBY;
+          marker2 = Marker.POSITION;
           start.oplaast();
           exit.oplaast();
           vundet = Tilstand.AI;
@@ -137,15 +142,14 @@ void mouseClicked()
 
       if (spil_ovre.click())
       {
-        spil_ovre.displayEt(); // for knap animation.
+        spil_ovre.displayEt(); 
         if (plade.getSpillerSkibe() == plade.MAXSKIBE())
         {
           spil_ovre.laast();
-          flag2 = Flag.GAET;
+          marker2 = Marker.GAET;
           error = Error.OK;
-          plade.aiSkibe();
-        }
-        else
+          plade.genererAiSkibe();
+        } else
         {
           error = Error.VARIABLEERROR;
         }
