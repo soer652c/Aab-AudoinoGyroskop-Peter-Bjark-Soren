@@ -1,6 +1,6 @@
 # Aab-Saenkeslagskib-Peter-Bjarke-Soren
 
-Sænkeslagskib manual
+Sænkeslagskib manual:
 
 Tryk på "Placer Skibe"
 
