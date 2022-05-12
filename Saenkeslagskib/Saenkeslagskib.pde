@@ -142,7 +142,7 @@ void mouseClicked()
 
       if (spil_ovre.click())
       {
-        spil_ovre.displayEt(); 
+        spil_ovre.displayEt();
         if (plade.getSpillerSkibe() == plade.MAXSKIBE())
         {
           spil_ovre.laast();
