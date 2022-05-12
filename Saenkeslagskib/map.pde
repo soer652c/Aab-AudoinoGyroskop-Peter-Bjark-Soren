@@ -93,7 +93,7 @@ class Plade
       aiSkibe = 5;
     } else
     {
-      throw new RuntimeException("...to little ships!");
+      throw new RuntimeException("Placer Venligst flere skibe");
     }
   }
 
